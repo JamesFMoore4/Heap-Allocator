@@ -24,6 +24,12 @@ static int seg_lst_index(unsigned size, int fit);
 static void mmodel_init(void);
 static void* mem_sbrk(int incr);
 
+/* Test functions */
+void print_blocks(void);
+void dump_blocks(void);
+void print_seg_lst(void);
+void dump_seg_lst(void);
+
 /* Constant macros */
 #define WSIZE 4
 #define DSIZE 8

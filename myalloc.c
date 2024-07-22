@@ -299,3 +299,110 @@ static void* mem_sbrk(int incr)
   mbrk += incr;
   return (void*)prev_mbrk;
 }
+
+/* Testing functions */
+void print_blocks(void)
+{
+  /*
+    Prints the number, size, and allocated status of all
+    blocks to the console 
+  */
+  size_t counter = 0;
+  char* ptr = first_block;
+  while (SIZE(HDRP(ptr)))
+  {
+    unsigned size = SIZE(HDRP(ptr));
+    char* status = ALLOC(HDRP(ptr)) ? "Allocated" : "Free";
+    printf("| Block #%zu | Size: %u | Status: %s |\n",
+	   counter++,
+	   size,
+	   status);
+    ptr = NEXT_BLKP(ptr);
+  }
+  printf("| Block #%zu | Size: %u | Status: %s |\n",
+	 counter,
+	 0,
+	 "Allocated");
+}
+
+void dump_blocks(void)
+{
+  /*
+    The same as print_blocks, but all information
+    is written to a file.
+  */
+  FILE* dmp = fopen("block_dmp", "wt");
+  size_t counter = 0;
+  char* ptr = first_block;
+  while (SIZE(HDRP(ptr)))
+  {
+    unsigned size = SIZE(HDRP(ptr));
+    char* status = ALLOC(HDRP(ptr)) ? "Allocated" : "Free";
+    fprintf(dmp, "| Block #%zu | Size: %u | Status: %s |\n",
+	   counter++,
+	   size,
+	   status);
+    ptr = NEXT_BLKP(ptr);
+  }
+  fprintf(dmp, "| Block #%zu | Size: %u | Status: %s |\n",
+	 counter,
+	 0,
+	 "Allocated");
+  fclose(dmp);
+}
+
+void print_seg_lst(void)
+{
+  /* 
+    Prints the contents of the segregated list
+    to the console.
+  */
+  for (int i = 0; i < NUM_CLASSES; i++)
+  {
+    printf("Size class: %u\n", classes[i]);
+    printf("-------------------------------------------------\n");
+    char** ptr = seg_lst[i];
+    for (; ptr && *ptr; ptr = (char**)*ptr)
+    {
+      printf("| Size: %u | Address: %p | Successor: %p |\n",
+	     SIZE(HDRP(ptr)),
+	     ptr,
+	     *ptr);
+    }
+    if (ptr)
+      printf("| Size: %u | Address: %p | Successor: %s |\n",
+	     SIZE(HDRP(ptr)),
+	     ptr,
+	     "None");
+    printf("\n");
+  }
+}
+
+void dump_seg_lst(void)
+{
+  /*
+    Prints the contents of the segregated list
+    to a file.
+  */
+  FILE* dmp = fopen("seglist_dmp", "wt");
+  for (int i = 0; i < NUM_CLASSES; i++)
+  {
+    fprintf(dmp, "Size class: %u\n", classes[i]);
+    fprintf(dmp, "-------------------------------------------------\n");
+    char** ptr = seg_lst[i];
+    for (; ptr && *ptr; ptr = (char**)*ptr)
+    {
+      fprintf(dmp, "| Size: %u | Address: %p | Successor: %p |\n",
+	     SIZE(HDRP(ptr)),
+	     ptr,
+	     *ptr);
+    }
+    if (ptr)
+      fprintf(dmp, "| Size: %u | Address: %p | Successor: %s |\n",
+	     SIZE(HDRP(ptr)),
+	     ptr,
+	     "None");
+    fprintf(dmp, "\n");
+  }
+  fclose(dmp);
+}
