@@ -133,6 +133,14 @@ static void place(void* bp, unsigned asize)
 static void* fit(unsigned asize)
 {
   /* Return pointer to free block */
+  
+  if (asize > classes[NUM_CLASSES-1])
+  {
+    char** ptr = seg_lst[NUM_CLASSES-1];
+    for (; ptr && SIZE(HDRP(ptr)) < asize; ptr = (char**)*ptr);
+    return (void*)ptr;
+  }
+  
   int index = seg_lst_index(asize, 1);
   for(; !seg_lst[index] && index < NUM_CLASSES; index++);
   
